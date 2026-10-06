@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // у папці фічі (наприклад, builder.Services.AddHotelsFeature();), див. CONTRIBUTING.md.
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((document, _, _) =>
@@ -16,7 +17,7 @@ builder.Services.AddOpenApi(options =>
         {
             Title = "Clinic Appointment API",
             Version = "v1",
-            Description = "REST API for clinic appointment scheduling and management."
+            Description = "REST API for managing clinic appointments and scheduling."
         };
 
         return Task.CompletedTask;
@@ -33,11 +34,14 @@ if (app.Environment.IsDevelopment())
 {
     // OpenAPI-документ: /openapi/v1.json
     app.MapOpenApi();
+
     app.MapScalarApiReference(options =>
     {
         options
             .WithTitle("Clinic Appointment API")
-            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            .WithDefaultHttpClient(
+                ScalarTarget.CSharp,
+                ScalarClient.HttpClient);
     });
 }
 
