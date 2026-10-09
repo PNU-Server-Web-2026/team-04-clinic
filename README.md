@@ -46,7 +46,11 @@ dotnet test
 Після запуску перевірте:
 
 - http://localhost:5080/api/ping → `{"message":"pong","utc":"..."}`
+- http://localhost:5080/api/info → назва API, версія збірки, середовище та час UTC
 - http://localhost:5080/openapi/v1.json → OpenAPI-документ (лише в середовищі Development)
+
+Параметри запису (`MinCancelHours`, `MaxBookingDaysAhead`, `NoShowAfterMinutes`)
+налаштовуються в секції `Appointment` файлу `appsettings.json` і перевіряються під час запуску API.
 
 ### Міграції EF Core
 

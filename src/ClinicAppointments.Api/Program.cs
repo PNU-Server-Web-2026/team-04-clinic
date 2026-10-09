@@ -1,3 +1,4 @@
+using ClinicAppointments.Api.Common;
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Health;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,12 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthFeature();
+
+builder.Services
+    .AddOptions<AppointmentOptions>()
+    .BindConfiguration(AppointmentOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
