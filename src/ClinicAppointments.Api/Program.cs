@@ -1,4 +1,5 @@
 using ClinicAppointments.Api.Data;
+using ClinicAppointments.Api.Features.Health;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddHealthFeature();
 
 var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
 
@@ -37,6 +39,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHealthFeature();
 
 app.Run();
 
