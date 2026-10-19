@@ -1,10 +1,11 @@
+
 using System.Collections.Concurrent;
 
 namespace ClinicAppointments.Api.Features.Specializations;
 
 public sealed class InMemorySpecializationService : ISpecializationService
 {
-    private readonly ConcurrentDictionary<int, SpecializationResponse> _specializations = new();
+    private readonly ConcurrentDictionary<int, Specialization> _specializations = new();
     private int _nextId;
 
     public Task<IReadOnlyCollection<SpecializationResponse>> GetAllAsync(
@@ -13,7 +14,12 @@ public sealed class InMemorySpecializationService : ISpecializationService
         cancellationToken.ThrowIfCancellationRequested();
 
         IReadOnlyCollection<SpecializationResponse> result =
-            _specializations.Values.ToArray();
+            _specializations.Values
+                .Select(s => new SpecializationResponse(
+                    s.Id,
+                    s.Name,
+                    s.Description))
+                .ToArray();
 
         return Task.FromResult(result);
     }
@@ -24,9 +30,17 @@ public sealed class InMemorySpecializationService : ISpecializationService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        _specializations.TryGetValue(id, out var specialization);
+        if (!_specializations.TryGetValue(id, out var specialization))
+        {
+            return Task.FromResult<SpecializationResponse?>(null);
+        }
 
-        return Task.FromResult(specialization);
+        var result = new SpecializationResponse(
+            specialization.Id,
+            specialization.Name,
+            specialization.Description);
+
+        return Task.FromResult<SpecializationResponse?>(result);
     }
 
     public Task<SpecializationResponse> CreateAsync(
@@ -37,14 +51,21 @@ public sealed class InMemorySpecializationService : ISpecializationService
 
         var id = Interlocked.Increment(ref _nextId);
 
-        var specialization = new SpecializationResponse(
-            id,
-            request.Name,
-            request.Description);
+        var specialization = new Specialization
+        {
+            Id = id,
+            Name = request.Name,
+            Description = request.Description
+        };
 
         _specializations[id] = specialization;
 
-        return Task.FromResult(specialization);
+        var result = new SpecializationResponse(
+            specialization.Id,
+            specialization.Name,
+            specialization.Description);
+
+        return Task.FromResult(result);
     }
 
     public Task<bool> UpdateAsync(
@@ -54,29 +75,24 @@ public sealed class InMemorySpecializationService : ISpecializationService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (!_specializations.ContainsKey(id))
+        while (_specializations.TryGetValue(id, out var current))
         {
-            return Task.FromResult(false);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var updated = new Specialization
+            {
+                Id = id,
+                Name = request.Name,
+                Description = request.Description
+            };
+
+            if (_specializations.TryUpdate(id, updated, current))
+            {
+                return Task.FromResult(true);
+            }
         }
 
-        var updated = new SpecializationResponse(
-            id,
-            request.Name,
-            request.Description);
-
-        var result = ((ICollection<KeyValuePair<int, SpecializationResponse>>)_specializations)
-            .Remove(new KeyValuePair<int, SpecializationResponse>(
-                id,
-                _specializations[id]));
-
-        if (!result)
-        {
-            return Task.FromResult(false);
-        }
-
-        _specializations[id] = updated;
-
-        return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 
     public Task<bool> DeleteAsync(
