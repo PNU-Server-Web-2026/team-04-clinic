@@ -29,6 +29,11 @@ public class SpecializationsApiTests : IClassFixture<ApiFactory>
         var response = await _client.GetAsync("/api/specializations");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var specializations = await response.Content
+            .ReadFromJsonAsync<SpecializationResponse[]>();
+
+        Assert.NotNull(specializations);
     }
 
     [Fact]
@@ -52,7 +57,6 @@ public class SpecializationsApiTests : IClassFixture<ApiFactory>
             request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.NotNull(response.Headers.Location);
 
         var created = await response.Content
             .ReadFromJsonAsync<SpecializationResponse>();
@@ -60,6 +64,12 @@ public class SpecializationsApiTests : IClassFixture<ApiFactory>
         Assert.NotNull(created);
         Assert.Equal("Cardiology", created.Name);
         Assert.True(created.Id > 0);
+
+        Assert.NotNull(response.Headers.Location);
+
+        Assert.Equal(
+            $"/api/specializations/{created.Id}",
+            response.Headers.Location!.AbsolutePath);
     }
 
     [Fact]

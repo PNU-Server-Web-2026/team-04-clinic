@@ -2,6 +2,7 @@ using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Health;
 using ClinicAppointments.Api.Features.Specializations;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
@@ -11,7 +12,6 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSpecializationsFeature();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthFeature();
-
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
