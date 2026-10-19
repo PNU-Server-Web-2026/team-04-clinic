@@ -1,4 +1,3 @@
-
 using System.Collections.Concurrent;
 
 namespace ClinicAppointments.Api.Features.Specializations;
