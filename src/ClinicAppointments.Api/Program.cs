@@ -1,7 +1,5 @@
-
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Health;
-using ClinicAppointments.Api.Features.Specializations;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -28,7 +26,6 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.Services.AddHealthFeature();
-builder.Services.AddSpecializationsFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
