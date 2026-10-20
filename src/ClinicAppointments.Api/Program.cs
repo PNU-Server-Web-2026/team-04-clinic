@@ -1,4 +1,7 @@
+
 using ClinicAppointments.Api.Data;
+using ClinicAppointments.Api.Features.Health;
+using ClinicAppointments.Api.Features.Specializations;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -24,8 +27,12 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+builder.Services.AddHealthFeature();
+builder.Services.AddSpecializationsFeature();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
@@ -46,6 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHealthFeature();
 
 app.Run();
 
