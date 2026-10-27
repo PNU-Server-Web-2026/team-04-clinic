@@ -7,9 +7,4 @@ public static class MedicalServicesFeatureExtensions
         services.AddSingleton<IMedicalServiceService, InMemoryMedicalServiceService>();
         return services;
     }
-
-    public static WebApplication MapMedicalServicesFeature(this WebApplication app)
-    {
-        return app;
-    }
 }

@@ -1,49 +1,51 @@
 using System.Net;
 using System.Net.Http.Json;
 using ClinicAppointments.Api.Features.MedicalServices;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ClinicAppointments.Api.Tests.Features.MedicalServices;
 
-public class MedicalServicesApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
+public class MedicalServicesApiTests : IClassFixture<ApiFactory>
 {
     private readonly HttpClient _client;
-    private readonly IMedicalServiceService _medicalServiceService;
 
     public MedicalServicesApiTests(ApiFactory factory)
     {
         _client = factory.CreateClient();
-        var scope = factory.Services.CreateScope();
-        _medicalServiceService = scope.ServiceProvider.GetRequiredService<IMedicalServiceService>();
-    }
-
-    public Task InitializeAsync()
-    {
-        _medicalServiceService.Clear();
-        return Task.CompletedTask;
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task GetAll_ReturnsEmptyArray_WhenNoServices()
+    public async Task GetAll_ReturnsServices()
     {
+        var createRequest = new CreateMedicalServiceRequest
+        {
+            Name = "Test Service",
+            DurationMinutes = 30,
+            Price = 50.00m
+        };
+
+        await _client.PostAsJsonAsync("/api/medical-services", createRequest);
+
         var response = await _client.GetAsync("/api/medical-services");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var services = await response.Content.ReadFromJsonAsync<List<MedicalServiceResponse>>();
         Assert.NotNull(services);
-        Assert.Empty(services);
+        Assert.NotEmpty(services);
     }
 
     [Fact]
     public async Task GetById_ReturnsNotFound_WhenServiceDoesNotExist()
     {
         var response = await _client.GetAsync("/api/medical-services/999");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsNotFound_WhenIdIsNotInteger()
+    {
+        var response = await _client.GetAsync("/api/medical-services/abc");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -111,6 +113,7 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var updateRequest = new UpdateMedicalServiceRequest
         {
             Name = "MRI",
+            DurationMinutes = 30,
             Price = 200.00m
         };
 
@@ -122,6 +125,7 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var updatedService = await getResponse.Content.ReadFromJsonAsync<MedicalServiceResponse>();
         Assert.NotNull(updatedService);
         Assert.Equal("MRI", updatedService.Name);
+        Assert.Equal(30, updatedService.DurationMinutes);
         Assert.Equal(200.00m, updatedService.Price);
     }
 
@@ -130,7 +134,9 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
     {
         var updateRequest = new UpdateMedicalServiceRequest
         {
-            Name = "MRI"
+            Name = "MRI",
+            DurationMinutes = 30,
+            Price = 200.00m
         };
 
         var response = await _client.PutAsJsonAsync("/api/medical-services/999", updateRequest);
