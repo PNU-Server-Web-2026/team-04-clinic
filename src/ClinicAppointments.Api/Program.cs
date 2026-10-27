@@ -1,6 +1,5 @@
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Health;
-using ClinicAppointments.Api.Features.Doctors;
 using ClinicAppointments.Api.Features.MedicalServices;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +11,6 @@ builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthFeature();
-builder.Services.AddDoctorsFeature();
 builder.Services.AddMedicalServicesFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
