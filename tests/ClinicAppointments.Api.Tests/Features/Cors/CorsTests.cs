@@ -1,7 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 
-namespace ClinicAppointments.Api.Tests.Cors;
+namespace ClinicAppointments.Api.Tests.Features.Cors;
 
 public class CorsTests(ApiFactory factory) : IClassFixture<ApiFactory>
 {
@@ -10,10 +10,11 @@ public class CorsTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [InlineData("http://localhost:3000")]
     public async Task Preflight_DevelopmentOrigin_ReturnsAllowHeaders(string origin)
     {
-        using var client = factory.WithWebHostBuilder(builder =>
+        await using var host = factory.WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
-        }).CreateClient();
+        });
+        using var client = host.CreateClient();
 
         var response = await SendPreflightAsync(client, origin);
 
@@ -25,10 +26,11 @@ public class CorsTests(ApiFactory factory) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Preflight_DisallowedOrigin_HasNoAllowHeaders()
     {
-        using var client = factory.WithWebHostBuilder(builder =>
+        await using var host = factory.WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
-        }).CreateClient();
+        });
+        using var client = host.CreateClient();
 
         var response = await SendPreflightAsync(client, "http://evil.example");
 
@@ -42,10 +44,11 @@ public class CorsTests(ApiFactory factory) : IClassFixture<ApiFactory>
     {
         const string configuredOrigin = "http://localhost:4173";
 
-        using var client = factory.WithWebHostBuilder(builder =>
+        await using var host = factory.WithWebHostBuilder(builder =>
         {
             builder.UseSetting("Cors:Origins:0", configuredOrigin);
-        }).CreateClient();
+        });
+        using var client = host.CreateClient();
 
         var allowed = await SendPreflightAsync(client, configuredOrigin);
         var denied = await SendPreflightAsync(client, "http://localhost:5173");
