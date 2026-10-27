@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Reflection;
+using ClinicAppointments.Api.Features.Info;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +21,7 @@ public class InfoTests(ApiFactory factory) : IClassFixture<ApiFactory>
         var body = await response.Content.ReadFromJsonAsync<InfoResponse>();
         Assert.NotNull(body);
         Assert.Equal("Clinic Appointment API", body.Name);
-        Assert.Equal(Assembly.GetEntryAssembly()?.GetName().Version?.ToString(), body.Version);
+        Assert.Equal(typeof(Program).Assembly.GetName().Version?.ToString(), body.Version);
         Assert.Equal("Testing", body.Environment);
         Assert.Equal(TimeSpan.Zero, body.Utc.Offset);
     }
@@ -35,12 +35,6 @@ public class InfoTests(ApiFactory factory) : IClassFixture<ApiFactory>
 
         Assert.Contains("MinCancelHours", exception.ToString());
     }
-
-    private sealed record InfoResponse(
-        string Name,
-        string Version,
-        string Environment,
-        DateTimeOffset Utc);
 
     private sealed class InvalidOptionsApiFactory : WebApplicationFactory<Program>
     {

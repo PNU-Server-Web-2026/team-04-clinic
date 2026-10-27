@@ -1,4 +1,3 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicAppointments.Api.Features.Info;
@@ -8,19 +7,16 @@ namespace ClinicAppointments.Api.Features.Info;
 public class InfoController(IHostEnvironment environment) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public ActionResult<InfoResponse> Get()
     {
-        var assembly = Assembly.GetEntryAssembly()
-            ?? throw new InvalidOperationException("The entry assembly could not be determined.");
+        var assembly = typeof(Program).Assembly;
         var version = assembly.GetName().Version?.ToString()
-            ?? throw new InvalidOperationException("The entry assembly version could not be determined.");
+            ?? throw new InvalidOperationException("The API assembly version could not be determined.");
 
-        return Ok(new
-        {
-            name = "Clinic Appointment API",
+        return Ok(new InfoResponse(
+            "Clinic Appointment API",
             version,
-            environment = environment.EnvironmentName,
-            utc = DateTimeOffset.UtcNow
-        });
+            environment.EnvironmentName,
+            DateTimeOffset.UtcNow));
     }
 }
