@@ -4,19 +4,21 @@ namespace ClinicAppointments.Api.Features.Doctors;
 
 public record UpdateDoctorRequest
 {
+    [Required]
     [MaxLength(100)]
-    public string? FirstName { get; init; }
+    public string FirstName { get; init; } = string.Empty;
 
+    [Required]
     [MaxLength(100)]
-    public string? LastName { get; init; }
+    public string LastName { get; init; } = string.Empty;
 
     public string? Email { get; init; }
 
     public string? Phone { get; init; }
 
     [MaxLength(20)]
-    public string? LicenseNumber { get; init; }
+    public string LicenseNumber { get; init; } = string.Empty;
 
     [Range(0, 60)]
-    public int? ExperienceYears { get; init; }
+    public int ExperienceYears { get; init; }
 }

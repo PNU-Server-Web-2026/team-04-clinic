@@ -1,49 +1,54 @@
 using System.Net;
 using System.Net.Http.Json;
 using ClinicAppointments.Api.Features.Doctors;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ClinicAppointments.Api.Tests.Features.Doctors;
 
-public class DoctorsApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
+public class DoctorsApiTests : IClassFixture<ApiFactory>
 {
     private readonly HttpClient _client;
-    private readonly IDoctorService _doctorService;
 
     public DoctorsApiTests(ApiFactory factory)
     {
         _client = factory.CreateClient();
-        var scope = factory.Services.CreateScope();
-        _doctorService = scope.ServiceProvider.GetRequiredService<IDoctorService>();
-    }
-
-    public Task InitializeAsync()
-    {
-        _doctorService.Clear();
-        return Task.CompletedTask;
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     [Fact]
-    public async Task GetAll_ReturnsEmptyArray_WhenNoDoctors()
+    public async Task GetAll_ReturnsDoctors()
     {
+        var createRequest = new CreateDoctorRequest
+        {
+            FirstName = "Test",
+            LastName = "Doctor",
+            Email = "test@example.com",
+            Phone = "+380501234567",
+            LicenseNumber = "LIC12345",
+            ExperienceYears = 5
+        };
+
+        await _client.PostAsJsonAsync("/api/doctors", createRequest);
+
         var response = await _client.GetAsync("/api/doctors");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var doctors = await response.Content.ReadFromJsonAsync<List<DoctorResponse>>();
         Assert.NotNull(doctors);
-        Assert.Empty(doctors);
+        Assert.NotEmpty(doctors);
     }
 
     [Fact]
     public async Task GetById_ReturnsNotFound_WhenDoctorDoesNotExist()
     {
         var response = await _client.GetAsync("/api/doctors/999");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsNotFound_WhenIdIsNotInteger()
+    {
+        var response = await _client.GetAsync("/api/doctors/abc");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -109,7 +114,6 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
     [Fact]
     public async Task Update_ReturnsNoContent_WhenDoctorExists()
     {
-        // Create a doctor first
         var createRequest = new CreateDoctorRequest
         {
             FirstName = "Bob",
@@ -124,10 +128,13 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var createdDoctor = await createResponse.Content.ReadFromJsonAsync<DoctorResponse>();
         Assert.NotNull(createdDoctor);
 
-        // Update the doctor
         var updateRequest = new UpdateDoctorRequest
         {
             FirstName = "Robert",
+            LastName = "Smith",
+            Email = "robert@example.com",
+            Phone = "+380501112224",
+            LicenseNumber = "LIC22222",
             ExperienceYears = 8
         };
 
@@ -135,11 +142,14 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // Verify the update
         var getResponse = await _client.GetAsync($"/api/doctors/{createdDoctor.Id}");
         var updatedDoctor = await getResponse.Content.ReadFromJsonAsync<DoctorResponse>();
         Assert.NotNull(updatedDoctor);
         Assert.Equal("Robert", updatedDoctor.FirstName);
+        Assert.Equal("Smith", updatedDoctor.LastName);
+        Assert.Equal("robert@example.com", updatedDoctor.Email);
+        Assert.Equal("+380501112224", updatedDoctor.Phone);
+        Assert.Equal("LIC22222", updatedDoctor.LicenseNumber);
         Assert.Equal(8, updatedDoctor.ExperienceYears);
     }
 
@@ -148,7 +158,12 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>, IAsyncLifetime
     {
         var updateRequest = new UpdateDoctorRequest
         {
-            FirstName = "Robert"
+            FirstName = "Robert",
+            LastName = "Smith",
+            Email = "robert@example.com",
+            Phone = "+380501112224",
+            LicenseNumber = "LIC22222",
+            ExperienceYears = 8
         };
 
         var response = await _client.PutAsJsonAsync("/api/doctors/999", updateRequest);
