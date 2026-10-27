@@ -6,7 +6,7 @@ namespace ClinicAppointments.Api.Features.MedicalServices;
 public class InMemoryMedicalServiceService : IMedicalServiceService
 {
     private readonly ConcurrentDictionary<int, MedicalServiceResponse> _services = new();
-    private int _nextId = 1;
+    private int _nextId = 0;
 
     public Task<IEnumerable<MedicalServiceResponse>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -43,23 +43,21 @@ public class InMemoryMedicalServiceService : IMedicalServiceService
 
         var updated = existing with
         {
-            Name = request.Name ?? existing.Name,
-            DurationMinutes = request.DurationMinutes ?? existing.DurationMinutes,
-            Price = request.Price ?? existing.Price
+            Name = request.Name,
+            DurationMinutes = request.DurationMinutes,
+            Price = request.Price
         };
 
-        _services.TryUpdate(id, updated, existing);
+        if (!_services.TryUpdate(id, updated, existing))
+        {
+            return Task.FromResult<MedicalServiceResponse?>(null);
+        }
+
         return Task.FromResult<MedicalServiceResponse?>(updated);
     }
 
     public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         return Task.FromResult(_services.TryRemove(id, out _));
-    }
-
-    public void Clear()
-    {
-        _services.Clear();
-        _nextId = 1;
     }
 }

@@ -11,6 +11,4 @@ public interface IMedicalServiceService
     Task<MedicalServiceResponse?> UpdateAsync(int id, UpdateMedicalServiceRequest request, CancellationToken cancellationToken);
 
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
-
-    void Clear();
 }

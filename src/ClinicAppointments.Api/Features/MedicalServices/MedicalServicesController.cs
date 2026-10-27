@@ -13,7 +13,7 @@ public class MedicalServicesController(IMedicalServiceService medicalServiceServ
         return Ok(services);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<MedicalServiceResponse>> GetById(int id, CancellationToken cancellationToken)
     {
         var service = await medicalServiceService.GetByIdAsync(id, cancellationToken);
@@ -31,7 +31,7 @@ public class MedicalServicesController(IMedicalServiceService medicalServiceServ
         return CreatedAtAction(nameof(GetById), new { id = service.Id }, service);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateMedicalServiceRequest request, CancellationToken cancellationToken)
     {
         var service = await medicalServiceService.UpdateAsync(id, request, cancellationToken);
@@ -42,7 +42,7 @@ public class MedicalServicesController(IMedicalServiceService medicalServiceServ
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var deleted = await medicalServiceService.DeleteAsync(id, cancellationToken);
