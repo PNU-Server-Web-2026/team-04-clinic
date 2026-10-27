@@ -13,7 +13,7 @@ public class DoctorsController(IDoctorService doctorService) : ControllerBase
         return Ok(doctors);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<DoctorResponse>> GetById(int id, CancellationToken cancellationToken)
     {
         var doctor = await doctorService.GetByIdAsync(id, cancellationToken);
@@ -31,7 +31,7 @@ public class DoctorsController(IDoctorService doctorService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = doctor.Id }, doctor);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, UpdateDoctorRequest request, CancellationToken cancellationToken)
     {
         var doctor = await doctorService.UpdateAsync(id, request, cancellationToken);
@@ -42,7 +42,7 @@ public class DoctorsController(IDoctorService doctorService) : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var deleted = await doctorService.DeleteAsync(id, cancellationToken);
