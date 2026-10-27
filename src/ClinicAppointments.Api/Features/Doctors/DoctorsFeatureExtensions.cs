@@ -7,10 +7,4 @@ public static class DoctorsFeatureExtensions
         services.AddSingleton<IDoctorService, InMemoryDoctorService>();
         return services;
     }
-
-    public static WebApplication MapDoctorsFeature(this WebApplication app)
-    {
-        // Controllers are mapped automatically by MapControllers() in Program.cs
-        return app;
-    }
 }
