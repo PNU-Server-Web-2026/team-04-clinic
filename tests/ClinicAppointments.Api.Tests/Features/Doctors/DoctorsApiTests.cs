@@ -26,7 +26,9 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>
             ExperienceYears = 5
         };
 
-        await _client.PostAsJsonAsync("/api/doctors", createRequest);
+        var createResponse = await _client.PostAsJsonAsync("/api/doctors", createRequest);
+        var createdDoctor = await createResponse.Content.ReadFromJsonAsync<DoctorResponse>();
+        Assert.NotNull(createdDoctor);
 
         var response = await _client.GetAsync("/api/doctors");
 
@@ -34,7 +36,7 @@ public class DoctorsApiTests : IClassFixture<ApiFactory>
 
         var doctors = await response.Content.ReadFromJsonAsync<List<DoctorResponse>>();
         Assert.NotNull(doctors);
-        Assert.NotEmpty(doctors);
+        Assert.Contains(doctors, d => d.Id == createdDoctor.Id);
     }
 
     [Fact]
