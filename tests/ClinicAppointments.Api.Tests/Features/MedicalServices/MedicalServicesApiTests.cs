@@ -23,7 +23,9 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>
             Price = 50.00m
         };
 
-        await _client.PostAsJsonAsync("/api/medical-services", createRequest);
+        var createResponse = await _client.PostAsJsonAsync("/api/medical-services", createRequest);
+        var createdService = await createResponse.Content.ReadFromJsonAsync<MedicalServiceResponse>();
+        Assert.NotNull(createdService);
 
         var response = await _client.GetAsync("/api/medical-services");
 
@@ -31,7 +33,7 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>
 
         var services = await response.Content.ReadFromJsonAsync<List<MedicalServiceResponse>>();
         Assert.NotNull(services);
-        Assert.NotEmpty(services);
+        Assert.Contains(services, s => s.Id == createdService.Id);
     }
 
     [Fact]
