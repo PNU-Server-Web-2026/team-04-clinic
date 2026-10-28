@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <!--
       Явне посилання, щоб усі проєкти (включно з тестами) отримували ту саму версію EF Core,
       що й Microsoft.EntityFrameworkCore.Design (інакше Npgsql тягне старішу EF Core і буде MSB3277).
