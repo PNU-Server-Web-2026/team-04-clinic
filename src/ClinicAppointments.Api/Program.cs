@@ -1,4 +1,5 @@
 using ClinicAppointments.Api.Data;
+using ClinicAppointments.Api.Features.Cors;
 using ClinicAppointments.Api.Features.Health;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -26,6 +27,7 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.Services.AddHealthFeature();
+builder.Services.AddCorsFeature(builder.Configuration);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
@@ -33,7 +35,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// HTTP-конвеєр.
+// HTTP-конвеєр. CORS — до авторизації та маршрутів контролерів,
+// інакше браузерний preflight не отримає Access-Control-Allow-*.
+app.UseCorsFeature();
+
 if (app.Environment.IsDevelopment())
 {
     // OpenAPI-документ: /openapi/v1.json
