@@ -1,5 +1,6 @@
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Health;
+using ClinicAppointments.Api.Features.Specializations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // у папці фічі (наприклад, builder.Services.AddHotelsFeature();), див. CONTRIBUTING.md.
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+builder.Services.AddSpecializationsFeature();
 builder.Services.AddOpenApi();
 builder.Services.AddHealthFeature();
 
@@ -19,7 +21,6 @@ var app = builder.Build();
 // HTTP-конвеєр.
 if (app.Environment.IsDevelopment())
 {
-    // OpenAPI-документ: /openapi/v1.json
     app.MapOpenApi();
 }
 
