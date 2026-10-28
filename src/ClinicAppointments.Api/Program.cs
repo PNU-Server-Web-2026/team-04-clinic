@@ -1,3 +1,4 @@
+using ClinicAppointments.Api.Common;
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Cors;
 using ClinicAppointments.Api.Features.Health;
@@ -27,6 +28,7 @@ builder.Services.AddOpenApi(options =>
 });
 
 builder.Services.AddHealthFeature();
+builder.Services.AddAppointmentOptions();
 builder.Services.AddCorsFeature(builder.Configuration);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
