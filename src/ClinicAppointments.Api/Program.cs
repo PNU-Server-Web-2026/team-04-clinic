@@ -2,7 +2,6 @@ using ClinicAppointments.Api.Common;
 using ClinicAppointments.Api.Data;
 using ClinicAppointments.Api.Features.Cors;
 using ClinicAppointments.Api.Features.Health;
-using ClinicAppointments.Api.Features.Doctors;
 using ClinicAppointments.Api.Features.MedicalServices;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -32,7 +31,6 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddHealthFeature();
 builder.Services.AddAppointmentOptions();
 builder.Services.AddCorsFeature(builder.Configuration);
-builder.Services.AddDoctorsFeature();
 builder.Services.AddMedicalServicesFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
