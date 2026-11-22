@@ -69,6 +69,7 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>
 
         var service = await response.Content.ReadFromJsonAsync<MedicalServiceResponse>();
         Assert.NotNull(service);
+        Assert.Equal($"/api/medical-services/{service.Id}", response.Headers.Location!.AbsolutePath);
         Assert.Equal("Consultation", service.Name);
         Assert.Equal(30, service.DurationMinutes);
         Assert.Equal(50.00m, service.Price);
@@ -174,5 +175,35 @@ public class MedicalServicesApiTests : IClassFixture<ApiFactory>
         var response = await _client.DeleteAsync("/api/medical-services/999");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Update_ConcurrentUpdates_ReturnsNoContent()
+    {
+        var createRequest = new CreateMedicalServiceRequest
+        {
+            Name = "Concurrent Test",
+            DurationMinutes = 30,
+            Price = 50.00m
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/medical-services", createRequest);
+        var createdService = await createResponse.Content.ReadFromJsonAsync<MedicalServiceResponse>();
+        Assert.NotNull(createdService);
+
+        var tasks = Enumerable.Range(0, 10).Select(async i =>
+        {
+            var updateRequest = new UpdateMedicalServiceRequest
+            {
+                Name = $"Updated Service {i}",
+                DurationMinutes = 30 + i,
+                Price = 50.00m + i
+            };
+            return await _client.PutAsJsonAsync($"/api/medical-services/{createdService.Id}", updateRequest);
+        }).ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+
+        Assert.All(responses, response => Assert.Equal(HttpStatusCode.NoContent, response.StatusCode));
     }
 }
