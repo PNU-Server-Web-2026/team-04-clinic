@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Threading;
 
 namespace ClinicAppointments.Api.Features.Cabinets;
 
@@ -36,24 +35,25 @@ public class InMemoryCabinetService : ICabinetService
 
     public Task<CabinetResponse?> UpdateAsync(int id, UpdateCabinetRequest request, CancellationToken cancellationToken)
     {
-        if (!_cabinets.TryGetValue(id, out var existing))
+        while (true)
         {
-            return Task.FromResult<CabinetResponse?>(null);
+            if (!_cabinets.TryGetValue(id, out var existing))
+            {
+                return Task.FromResult<CabinetResponse?>(null);
+            }
+
+            var updated = existing with
+            {
+                Number = request.Number,
+                Floor = request.Floor,
+                Description = request.Description
+            };
+
+            if (_cabinets.TryUpdate(id, updated, existing))
+            {
+                return Task.FromResult<CabinetResponse?>(updated);
+            }
         }
-
-        var updated = existing with
-        {
-            Number = request.Number,
-            Floor = request.Floor,
-            Description = request.Description
-        };
-
-        if (!_cabinets.TryUpdate(id, updated, existing))
-        {
-            return Task.FromResult<CabinetResponse?>(null);
-        }
-
-        return Task.FromResult<CabinetResponse?>(updated);
     }
 
     public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)

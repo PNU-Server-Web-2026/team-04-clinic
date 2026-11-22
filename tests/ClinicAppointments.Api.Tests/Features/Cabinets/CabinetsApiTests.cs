@@ -176,4 +176,34 @@ public class CabinetsApiTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Update_ConcurrentUpdates_ReturnsNoContent()
+    {
+        var createRequest = new CreateCabinetRequest
+        {
+            Number = "701",
+            Floor = 7,
+            Description = "Initial description"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/cabinets", createRequest);
+        var createdCabinet = await createResponse.Content.ReadFromJsonAsync<CabinetResponse>();
+        Assert.NotNull(createdCabinet);
+
+        var tasks = Enumerable.Range(0, 10).Select(async i =>
+        {
+            var updateRequest = new UpdateCabinetRequest
+            {
+                Number = "701",
+                Floor = 7,
+                Description = $"Updated Description {i}"
+            };
+            return await _client.PutAsJsonAsync($"/api/cabinets/{createdCabinet.Id}", updateRequest);
+        }).ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+
+        Assert.All(responses, response => Assert.Equal(HttpStatusCode.NoContent, response.StatusCode));
+    }
 }
