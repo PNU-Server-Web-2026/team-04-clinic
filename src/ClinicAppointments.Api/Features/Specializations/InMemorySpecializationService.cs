@@ -35,23 +35,24 @@ public class InMemorySpecializationService : ISpecializationService
 
     public Task<SpecializationResponse?> UpdateAsync(int id, UpdateSpecializationRequest request, CancellationToken cancellationToken)
     {
-        if (!_specializations.TryGetValue(id, out var existing))
+        while (true)
         {
-            return Task.FromResult<SpecializationResponse?>(null);
+            if (!_specializations.TryGetValue(id, out var existing))
+            {
+                return Task.FromResult<SpecializationResponse?>(null);
+            }
+
+            var updated = existing with
+            {
+                Name = request.Name,
+                Description = request.Description
+            };
+
+            if (_specializations.TryUpdate(id, updated, existing))
+            {
+                return Task.FromResult<SpecializationResponse?>(updated);
+            }
         }
-
-        var updated = existing with
-        {
-            Name = request.Name,
-            Description = request.Description
-        };
-
-        if (!_specializations.TryUpdate(id, updated, existing))
-        {
-            return Task.FromResult<SpecializationResponse?>(null);
-        }
-
-        return Task.FromResult<SpecializationResponse?>(updated);
     }
 
     public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)

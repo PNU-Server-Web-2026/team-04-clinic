@@ -167,4 +167,32 @@ public class SpecializationsApiTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Update_ConcurrentUpdates_ReturnsNoContent()
+    {
+        var createRequest = new CreateSpecializationRequest
+        {
+            Name = "Concurrent Test",
+            Description = "Initial description"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/specializations", createRequest);
+        var createdSpecialization = await createResponse.Content.ReadFromJsonAsync<SpecializationResponse>();
+        Assert.NotNull(createdSpecialization);
+
+        var tasks = Enumerable.Range(0, 10).Select(async i =>
+        {
+            var updateRequest = new UpdateSpecializationRequest
+            {
+                Name = $"Updated Name {i}",
+                Description = $"Updated Description {i}"
+            };
+            return await _client.PutAsJsonAsync($"/api/specializations/{createdSpecialization.Id}", updateRequest);
+        }).ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+
+        Assert.All(responses, response => Assert.Equal(HttpStatusCode.NoContent, response.StatusCode));
+    }
 }
