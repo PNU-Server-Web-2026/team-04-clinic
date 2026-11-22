@@ -193,4 +193,38 @@ public class PatientsApiTests : IClassFixture<ApiFactory>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Update_ConcurrentUpdates_ReturnsNoContent()
+    {
+        var createRequest = new CreatePatientRequest
+        {
+            FirstName = "Concurrent",
+            LastName = "Test",
+            BirthDate = new DateOnly(1990, 1, 1),
+            Phone = "+380501234567",
+            Email = "concurrent@example.com"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/patients", createRequest);
+        var createdPatient = await createResponse.Content.ReadFromJsonAsync<PatientResponse>();
+        Assert.NotNull(createdPatient);
+
+        var tasks = Enumerable.Range(0, 10).Select(async i =>
+        {
+            var updateRequest = new UpdatePatientRequest
+            {
+                FirstName = $"Updated First {i}",
+                LastName = "Test",
+                BirthDate = new DateOnly(1990, 1, 1),
+                Phone = "+380501234567",
+                Email = "concurrent@example.com"
+            };
+            return await _client.PutAsJsonAsync($"/api/patients/{createdPatient.Id}", updateRequest);
+        }).ToArray();
+
+        var responses = await Task.WhenAll(tasks);
+
+        Assert.All(responses, response => Assert.Equal(HttpStatusCode.NoContent, response.StatusCode));
+    }
 }
