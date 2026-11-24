@@ -4,6 +4,7 @@ using ClinicAppointments.Api.Features.Cors;
 using ClinicAppointments.Api.Features.Health;
 using ClinicAppointments.Api.Features.MedicalServices;
 using ClinicAppointments.Api.Features.Patients;
+using ClinicAppointments.Api.Features.Cabinets;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -34,6 +35,7 @@ builder.Services.AddAppointmentOptions();
 builder.Services.AddCorsFeature(builder.Configuration);
 builder.Services.AddMedicalServicesFeature();
 builder.Services.AddPatientsFeature();
+builder.Services.AddCabinetsFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
