@@ -15,6 +15,7 @@ public class PingTests(ApiFactory factory) : IClassFixture<ApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var body = await response.Content.ReadFromJsonAsync<PingResponse>();
+
         Assert.NotNull(body);
         Assert.Equal("pong", body.Message);
     }
