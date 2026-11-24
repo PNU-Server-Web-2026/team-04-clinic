@@ -1,3 +1,4 @@
+using ClinicAppointments.Api.Features.Doctors;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicAppointments.Api.Data;
@@ -7,8 +8,7 @@ namespace ClinicAppointments.Api.Data;
 /// </summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    // Сутності (DbSet<T>) додаються в задачах, наприклад:
-    // public DbSet<Hotel> Hotels => Set<Hotel>();
+    public DbSet<Doctor> Doctors => Set<Doctor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

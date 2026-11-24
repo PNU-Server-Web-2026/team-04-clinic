@@ -4,6 +4,8 @@
 
 Діаграма охоплює сутності, які прямо названі в задачі (Specialization, Doctor, Patient, MedicalService, Cabinet), і сутності, без яких ці зв'язки не зберігаються в реляційній базі: таблицю M:N, графік, прийом і запис медичної картки.
 
+Міграція `AddDoctor` уже створює таблицю `Doctors` (`Id`, `FirstName`, `LastName`, `Email`, `Phone`, `LicenseNumber`, `ExperienceYears`). `SpecializationId`, `CabinetId` і `DeletedAt` у цій таблиці ще відсутні.
+
 ## Діаграма
 
 ```mermaid
