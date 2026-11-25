@@ -4,6 +4,8 @@
 
 Діаграма охоплює сутності, які прямо названі в задачі (Specialization, Doctor, Patient, MedicalService, Cabinet), і сутності, без яких ці зв'язки не зберігаються в реляційній базі: таблицю M:N, графік, прийом і запис медичної картки.
 
+Міграція `AddCabinet` створює таблицю `Cabinets` (`Id`, `Number`, `Floor`, `Description`).
+
 ## Діаграма
 
 ```mermaid
@@ -41,8 +43,8 @@ erDiagram
     Cabinet {
         int Id PK
         string Number UK "varchar(10) NOT NULL"
-        int Floor "smallint NOT NULL"
-        string Description "text NULL"
+        int Floor "integer NOT NULL"
+        string Description "varchar(500) NULL"
     }
 
     Patient {
@@ -115,8 +117,8 @@ erDiagram
 | Doctor | DeletedAt | `timestamptz` | NULL; значення означає звільнення, рядок не видаляється |
 | Cabinet | Id | `integer` | PK |
 | Cabinet | Number | `varchar(10)` | NOT NULL, UNIQUE |
-| Cabinet | Floor | `smallint` | NOT NULL |
-| Cabinet | Description | `text` | NULL |
+| Cabinet | Floor | `integer` | NOT NULL |
+| Cabinet | Description | `varchar(500)` | NULL |
 | Patient | Id | `integer` | PK |
 | Patient | FirstName | `varchar(100)` | NOT NULL |
 | Patient | LastName | `varchar(100)` | NOT NULL |
@@ -170,7 +172,7 @@ erDiagram
 
 1. **Ідентифікатори — `integer`.** Так уже зроблені контракти S2 (спеціалізації, лікарі, послуги). Окремий UUID не вводиться.
 2. **Email і телефон лікаря обов'язкові.** У ТЗ email унікальний, телефон — E.164. У поточному in-memory DTO лікаря ці поля ще nullable; база фіксує NOT NULL, щоб унікальність email була повною, а не лише для непорожніх значень.
-3. **Довжини, яких немає в ТЗ, узяті з контрактів S2.** LicenseNumber — 20 символів, назва послуги — 200. Імена людей і спеціалізації — 100, як у ТЗ для назви спеціалізації і як у DTO лікаря.
+3. **Довжини, яких немає в ТЗ, узяті з контрактів S2.** LicenseNumber — 20 символів, назва послуги — 200, опис кабінету — 500. Імена людей і спеціалізації — 100, як у ТЗ для назви спеціалізації і як у DTO лікаря. Поверх кабінету — `integer`, як у DTO.
 4. **Вік пацієнта не є колонкою і не є CHECK у базі.** Діапазон 0..120 залежить від поточної дати, а `CHECK` у PostgreSQL приймає лише immutable-вирази. Зберігається `BirthDate`, межу перевіряє сервіс.
 5. **Оптимістична конкурентність пацієнта — через системну колонку `xmin`, без окремого поля.** ТЗ вимагає контроль конкурентного доступу під час зміни. EF Core може використати `xmin` як concurrency token.
 6. **Soft delete лише в лікаря.** `DeletedAt` замість фізичного видалення. Інші довідники видаляються фізично, з правилами RESTRICT / SET NULL вище. Звільнений лікар зникає з пошуку, але його прийоми і записи картки лишаються.
