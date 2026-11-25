@@ -4,6 +4,8 @@
 
 Діаграма охоплює сутності, які прямо названі в задачі (Specialization, Doctor, Patient, MedicalService, Cabinet), і сутності, без яких ці зв'язки не зберігаються в реляційній базі: таблицю M:N, графік, прийом і запис медичної картки.
 
+Міграція `AddSpecialization` створює таблицю `Specializations` (`Id`, `Name`, `Description`).
+
 ## Діаграма
 
 ```mermaid
@@ -22,7 +24,7 @@ erDiagram
     Specialization {
         int Id PK
         string Name UK "varchar(100) NOT NULL"
-        string Description "text NULL"
+        string Description "varchar(1000) NULL"
     }
 
     Doctor {
@@ -102,7 +104,7 @@ erDiagram
 |---|---|---|---|
 | Specialization | Id | `integer` | PK |
 | Specialization | Name | `varchar(100)` | NOT NULL, UNIQUE |
-| Specialization | Description | `text` | NULL |
+| Specialization | Description | `varchar(1000)` | NULL |
 | Doctor | Id | `integer` | PK |
 | Doctor | SpecializationId | `integer` | NOT NULL, FK |
 | Doctor | CabinetId | `integer` | NULL, FK |
@@ -170,7 +172,7 @@ erDiagram
 
 1. **Ідентифікатори — `integer`.** Так уже зроблені контракти S2 (спеціалізації, лікарі, послуги). Окремий UUID не вводиться.
 2. **Email і телефон лікаря обов'язкові.** У ТЗ email унікальний, телефон — E.164. У поточному in-memory DTO лікаря ці поля ще nullable; база фіксує NOT NULL, щоб унікальність email була повною, а не лише для непорожніх значень.
-3. **Довжини, яких немає в ТЗ, узяті з контрактів S2.** LicenseNumber — 20 символів, назва послуги — 200. Імена людей і спеціалізації — 100, як у ТЗ для назви спеціалізації і як у DTO лікаря.
+3. **Довжини, яких немає в ТЗ, узяті з контрактів S2.** LicenseNumber — 20 символів, назва послуги — 200, опис спеціалізації — 1000. Імена людей і спеціалізації — 100, як у ТЗ для назви спеціалізації і як у DTO лікаря.
 4. **Вік пацієнта не є колонкою і не є CHECK у базі.** Діапазон 0..120 залежить від поточної дати, а `CHECK` у PostgreSQL приймає лише immutable-вирази. Зберігається `BirthDate`, межу перевіряє сервіс.
 5. **Оптимістична конкурентність пацієнта — через системну колонку `xmin`, без окремого поля.** ТЗ вимагає контроль конкурентного доступу під час зміни. EF Core може використати `xmin` як concurrency token.
 6. **Soft delete лише в лікаря.** `DeletedAt` замість фізичного видалення. Інші довідники видаляються фізично, з правилами RESTRICT / SET NULL вище. Звільнений лікар зникає з пошуку, але його прийоми і записи картки лишаються.
