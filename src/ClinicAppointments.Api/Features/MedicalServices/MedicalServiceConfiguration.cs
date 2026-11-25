@@ -16,7 +16,7 @@ public class MedicalServiceConfiguration : IEntityTypeConfiguration<MedicalServi
 
     public const int DurationMinutesStep = 5;
 
-    public const decimal PriceMinimum = 0m;
+    public const int PriceMin = 0;
 
     public const int PricePrecision = 10;
 
@@ -37,7 +37,7 @@ public class MedicalServiceConfiguration : IEntityTypeConfiguration<MedicalServi
             .IsRequired()
             .HasPrecision(PricePrecision, PriceScale);
 
-        builder.ToTable("MedicalServices", table =>
+        builder.ToTable(table =>
         {
             table.HasCheckConstraint(
                 "CK_MedicalServices_DurationMinutes",
@@ -46,7 +46,7 @@ public class MedicalServiceConfiguration : IEntityTypeConfiguration<MedicalServi
                 $"\"DurationMinutes\" % {DurationMinutesStep} = 0");
             table.HasCheckConstraint(
                 "CK_MedicalServices_Price",
-                $"\"Price\" >= {PriceMinimum}");
+                $"\"Price\" >= {PriceMin}");
         });
     }
 }

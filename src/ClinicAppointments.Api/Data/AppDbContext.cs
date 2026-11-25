@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using ClinicAppointments.Api.Features.MedicalServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClinicAppointments.Api.Data;
 
