@@ -1,6 +1,9 @@
 namespace ClinicAppointments.Api.Features.MedicalServices;
 
-public sealed class MedicalService
+/// <summary>
+/// Медична послуга, яку надає клініка.
+/// </summary>
+public class MedicalService
 {
     public int Id { get; set; }
 

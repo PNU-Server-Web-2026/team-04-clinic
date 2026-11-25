@@ -56,7 +56,7 @@ erDiagram
 
     MedicalService {
         int Id PK
-        string Name UK "varchar(200) NOT NULL"
+        string Name "varchar(200) NOT NULL"
         int DurationMinutes "10..240, кратне 5"
         numeric Price "numeric(10,2) >= 0"
     }
@@ -124,7 +124,7 @@ erDiagram
 | Patient | Phone | `varchar(16)` | NOT NULL, той самий формат E.164 |
 | Patient | Email | `varchar(256)` | NOT NULL, UNIQUE |
 | MedicalService | Id | `integer` | PK |
-| MedicalService | Name | `varchar(200)` | NOT NULL, UNIQUE |
+| MedicalService | Name | `varchar(200)` | NOT NULL; унікальність не потрібна |
 | MedicalService | DurationMinutes | `integer` | NOT NULL, CHECK від 10 до 240 і кратне 5 |
 | MedicalService | Price | `numeric(10,2)` | NOT NULL, CHECK ≥ 0 |
 | DoctorMedicalService | DoctorId | `integer` | PK, FK |

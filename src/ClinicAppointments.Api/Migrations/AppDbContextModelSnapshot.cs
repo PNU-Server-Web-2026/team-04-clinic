@@ -43,9 +43,6 @@ namespace ClinicAppointments.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("MedicalServices", null, t =>
                         {
                             t.HasCheckConstraint("CK_MedicalServices_DurationMinutes", "\"DurationMinutes\" >= 10 AND \"DurationMinutes\" <= 240 AND \"DurationMinutes\" % 5 = 0");

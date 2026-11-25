@@ -3,34 +3,50 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ClinicAppointments.Api.Features.MedicalServices;
 
-public sealed class MedicalServiceConfiguration : IEntityTypeConfiguration<MedicalService>
+/// <summary>
+/// Налаштування збереження медичних послуг у базі даних.
+/// </summary>
+public class MedicalServiceConfiguration : IEntityTypeConfiguration<MedicalService>
 {
+    public const int NameMaxLength = 200;
+
+    public const int DurationMinutesMin = 10;
+
+    public const int DurationMinutesMax = 240;
+
+    public const int DurationMinutesStep = 5;
+
+    public const decimal PriceMinimum = 0m;
+
+    public const int PricePrecision = 10;
+
+    public const int PriceScale = 2;
+
     public void Configure(EntityTypeBuilder<MedicalService> builder)
     {
-        builder.ToTable("MedicalServices", table =>
-        {
-            table.HasCheckConstraint(
-                "CK_MedicalServices_DurationMinutes",
-                "\"DurationMinutes\" >= 10 AND \"DurationMinutes\" <= 240 AND \"DurationMinutes\" % 5 = 0");
-            table.HasCheckConstraint(
-                "CK_MedicalServices_Price",
-                "\"Price\" >= 0");
-        });
-
         builder.HasKey(service => service.Id);
 
         builder.Property(service => service.Name)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(NameMaxLength);
 
         builder.Property(service => service.DurationMinutes)
             .IsRequired();
 
         builder.Property(service => service.Price)
             .IsRequired()
-            .HasPrecision(10, 2);
+            .HasPrecision(PricePrecision, PriceScale);
 
-        builder.HasIndex(service => service.Name)
-            .IsUnique();
+        builder.ToTable("MedicalServices", table =>
+        {
+            table.HasCheckConstraint(
+                "CK_MedicalServices_DurationMinutes",
+                $"\"DurationMinutes\" >= {DurationMinutesMin} AND " +
+                $"\"DurationMinutes\" <= {DurationMinutesMax} AND " +
+                $"\"DurationMinutes\" % {DurationMinutesStep} = 0");
+            table.HasCheckConstraint(
+                "CK_MedicalServices_Price",
+                $"\"Price\" >= {PriceMinimum}");
+        });
     }
 }

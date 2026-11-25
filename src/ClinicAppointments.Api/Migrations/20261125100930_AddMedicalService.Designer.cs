@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClinicAppointments.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261125085631_AddMedicalService")]
+    [Migration("20261125100930_AddMedicalService")]
     partial class AddMedicalService
     {
         /// <inheritdoc />
@@ -45,9 +45,6 @@ namespace ClinicAppointments.Api.Migrations
                         .HasColumnType("numeric(10,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("MedicalServices", null, t =>
                         {

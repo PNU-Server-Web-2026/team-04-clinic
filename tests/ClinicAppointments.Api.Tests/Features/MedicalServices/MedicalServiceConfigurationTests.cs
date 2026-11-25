@@ -36,20 +36,20 @@ public class MedicalServiceConfigurationTests
         Assert.False(price.IsNullable);
         Assert.Equal((10, 2), (price.GetPrecision()!.Value, price.GetScale()!.Value));
 
-        Assert.Contains(entity.GetIndexes(), index =>
+        Assert.DoesNotContain(entity.GetIndexes(), index =>
             index.IsUnique &&
             index.Properties.Count == 1 &&
             index.Properties[0].Name == nameof(MedicalService.Name));
 
-        var table = entity.GetCheckConstraints().ToDictionary(
+        var constraints = entity.GetCheckConstraints().ToDictionary(
             constraint => constraint.Name!,
             constraint => constraint.Sql);
 
-        Assert.Contains("CK_MedicalServices_DurationMinutes", table.Keys);
-        Assert.Contains("\"DurationMinutes\" >= 10", table["CK_MedicalServices_DurationMinutes"]);
-        Assert.Contains("\"DurationMinutes\" <= 240", table["CK_MedicalServices_DurationMinutes"]);
-        Assert.Contains("\"DurationMinutes\" % 5 = 0", table["CK_MedicalServices_DurationMinutes"]);
-        Assert.Contains("CK_MedicalServices_Price", table.Keys);
-        Assert.Contains("\"Price\" >= 0", table["CK_MedicalServices_Price"]);
+        Assert.Contains("CK_MedicalServices_DurationMinutes", constraints.Keys);
+        Assert.Contains("\"DurationMinutes\" >= 10", constraints["CK_MedicalServices_DurationMinutes"]);
+        Assert.Contains("\"DurationMinutes\" <= 240", constraints["CK_MedicalServices_DurationMinutes"]);
+        Assert.Contains("\"DurationMinutes\" % 5 = 0", constraints["CK_MedicalServices_DurationMinutes"]);
+        Assert.Contains("CK_MedicalServices_Price", constraints.Keys);
+        Assert.Contains("\"Price\" >= 0", constraints["CK_MedicalServices_Price"]);
     }
 }

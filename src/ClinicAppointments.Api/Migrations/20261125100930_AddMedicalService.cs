@@ -27,12 +27,6 @@ namespace ClinicAppointments.Api.Migrations
                     table.CheckConstraint("CK_MedicalServices_DurationMinutes", "\"DurationMinutes\" >= 10 AND \"DurationMinutes\" <= 240 AND \"DurationMinutes\" % 5 = 0");
                     table.CheckConstraint("CK_MedicalServices_Price", "\"Price\" >= 0");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MedicalServices_Name",
-                table: "MedicalServices",
-                column: "Name",
-                unique: true);
         }
 
         /// <inheritdoc />
