@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using ClinicAppointments.Api.Features.Specializations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicAppointments.Api.Tests.Features.Specializations;
 
@@ -188,11 +189,137 @@ public class SpecializationsApiTests : IClassFixture<ApiFactory>
                 Name = $"Updated Name {i}",
                 Description = $"Updated Description {i}"
             };
+
             return await _client.PutAsJsonAsync($"/api/specializations/{createdSpecialization.Id}", updateRequest);
         }).ToArray();
 
         var responses = await Task.WhenAll(tasks);
 
         Assert.All(responses, response => Assert.Equal(HttpStatusCode.NoContent, response.StatusCode));
+    }
+
+    public static TheoryData<string?> InvalidNames => new()
+    {
+        null,
+        "",
+        "   ",
+        new string('A', 101)
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidNames))]
+    public async Task Create_ReturnsBadRequest_WhenNameIsInvalid(string? name)
+    {
+        var request = new CreateSpecializationRequest
+        {
+            Name = name!,
+            Description = "Test specialization"
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/specializations", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(problem);
+        Assert.Equal(400, problem.Status);
+        Assert.True(problem.Errors.ContainsKey("Name"));
+        Assert.NotEmpty(problem.Errors["Name"]);
+    }
+
+    [Theory]
+    [MemberData(nameof(InvalidNames))]
+    public async Task Update_ReturnsBadRequest_WhenNameIsInvalid(string? name)
+    {
+        var createRequest = new CreateSpecializationRequest
+        {
+            Name = "Cardiology",
+            Description = "Original specialization"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/specializations", createRequest);
+
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
+        var createdSpecialization = await createResponse.Content.ReadFromJsonAsync<SpecializationResponse>();
+
+        Assert.NotNull(createdSpecialization);
+
+        var updateRequest = new UpdateSpecializationRequest
+        {
+            Name = name!,
+            Description = "Updated specialization"
+        };
+
+        var response = await _client.PutAsJsonAsync(
+            $"/api/specializations/{createdSpecialization.Id}", updateRequest);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+
+        Assert.NotNull(problem);
+        Assert.Equal(400, problem.Status);
+        Assert.True(problem.Errors.ContainsKey("Name"));
+        Assert.NotEmpty(problem.Errors["Name"]);
+
+        var getResponse = await _client.GetAsync(
+            $"/api/specializations/{createdSpecialization.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var unchangedSpecialization = await getResponse.Content.ReadFromJsonAsync<SpecializationResponse>();
+
+        Assert.NotNull(unchangedSpecialization);
+        Assert.Equal("Cardiology", unchangedSpecialization.Name);
+        Assert.Equal("Original specialization", unchangedSpecialization.Description);
+    }
+
+    [Theory]
+    [InlineData(1, 100)]
+    [InlineData(100, 1)]
+    public async Task CreateAndUpdate_AcceptValidBoundaryNames(
+        int createNameLength,
+        int updateNameLength)
+    {
+        var createName = new string('A', createNameLength);
+        var updateName = new string('B', updateNameLength);
+
+        var createRequest = new CreateSpecializationRequest
+        {
+            Name = createName,
+            Description = "Boundary specialization"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/specializations", createRequest);
+
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
+        var createdSpecialization = await createResponse.Content.ReadFromJsonAsync<SpecializationResponse>();
+
+        Assert.NotNull(createdSpecialization);
+        Assert.Equal(createName, createdSpecialization.Name);
+
+        var updateRequest = new UpdateSpecializationRequest
+        {
+            Name = updateName,
+            Description = "Updated boundary specialization"
+        };
+
+        var updateResponse = await _client.PutAsJsonAsync(
+            $"/api/specializations/{createdSpecialization.Id}", updateRequest);
+
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var getResponse = await _client.GetAsync(
+            $"/api/specializations/{createdSpecialization.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var updatedSpecialization = await getResponse.Content.ReadFromJsonAsync<SpecializationResponse>();
+
+        Assert.NotNull(updatedSpecialization);
+        Assert.Equal(updateName, updatedSpecialization.Name);
     }
 }
