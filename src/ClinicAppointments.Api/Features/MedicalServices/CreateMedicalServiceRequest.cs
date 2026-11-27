@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ClinicAppointments.Api.Common.Validation;
 
 namespace ClinicAppointments.Api.Features.MedicalServices;
 
@@ -9,6 +10,7 @@ public record CreateMedicalServiceRequest
     public string Name { get; init; } = string.Empty;
 
     [Range(10, 240)]
+    [MultipleOf(5)]
     public int DurationMinutes { get; init; }
 
     [Range(0, double.MaxValue)]
