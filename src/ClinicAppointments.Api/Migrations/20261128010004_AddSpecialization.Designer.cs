@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClinicAppointments.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261125222131_AddSpecialization")]
+    [Migration("20261128010004_AddSpecialization")]
     partial class AddSpecialization
     {
         /// <inheritdoc />
@@ -42,9 +42,6 @@ namespace ClinicAppointments.Api.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Specializations");
                 });

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace ClinicAppointments.Api.Features.Specializations;
 
 /// <summary>
-/// Обмеження спеціалізації в PostgreSQL: довжина, обов'язковість і унікальність назви.
+/// Обмеження спеціалізації в PostgreSQL: довжина й обов'язковість.
 /// </summary>
 public class SpecializationConfiguration : IEntityTypeConfiguration<Specialization>
 {
@@ -22,8 +22,5 @@ public class SpecializationConfiguration : IEntityTypeConfiguration<Specializati
 
         builder.Property(specialization => specialization.Description)
             .HasMaxLength(DescriptionMaxLength);
-
-        builder.HasIndex(specialization => specialization.Name)
-            .IsUnique();
     }
 }

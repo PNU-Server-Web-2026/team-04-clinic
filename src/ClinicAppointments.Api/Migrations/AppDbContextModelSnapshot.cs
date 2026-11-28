@@ -40,9 +40,6 @@ namespace ClinicAppointments.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Specializations");
                 });
 #pragma warning restore 612, 618

@@ -24,12 +24,6 @@ namespace ClinicAppointments.Api.Migrations
                 {
                     table.PrimaryKey("PK_Specializations", x => x.Id);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Specializations_Name",
-                table: "Specializations",
-                column: "Name",
-                unique: true);
         }
 
         /// <inheritdoc />

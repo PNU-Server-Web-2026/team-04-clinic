@@ -4,7 +4,7 @@
 
 Діаграма охоплює сутності, які прямо названі в задачі (Specialization, Doctor, Patient, MedicalService, Cabinet), і сутності, без яких ці зв'язки не зберігаються в реляційній базі: таблицю M:N, графік, прийом і запис медичної картки.
 
-Міграція `AddSpecialization` створює таблицю `Specializations` (`Id`, `Name`, `Description`).
+Міграція `AddSpecialization` створює таблицю `Specializations` (`Id`, `Name`, `Description`). Унікального індексу назви в ній немає: його додасть #29 разом із відповіддю 409.
 
 ## Діаграма
 
@@ -23,7 +23,7 @@ erDiagram
 
     Specialization {
         int Id PK
-        string Name UK "varchar(100) NOT NULL"
+        string Name "varchar(100) NOT NULL, унікальний індекс у #29"
         string Description "varchar(1000) NULL"
     }
 
@@ -103,7 +103,7 @@ erDiagram
 | Сутність | Поле | Тип | Обмеження |
 |---|---|---|---|
 | Specialization | Id | `integer` | PK |
-| Specialization | Name | `varchar(100)` | NOT NULL, UNIQUE |
+| Specialization | Name | `varchar(100)` | NOT NULL; унікальний індекс додасть #29 |
 | Specialization | Description | `varchar(1000)` | NULL |
 | Doctor | Id | `integer` | PK |
 | Doctor | SpecializationId | `integer` | NOT NULL, FK |
