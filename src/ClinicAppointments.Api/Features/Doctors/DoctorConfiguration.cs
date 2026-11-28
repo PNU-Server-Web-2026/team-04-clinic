@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace ClinicAppointments.Api.Features.Doctors;
 
 /// <summary>
-/// Обмеження лікаря в PostgreSQL: довжини, обов'язковість, унікальність і перевірки.
+/// Обмеження лікаря в PostgreSQL: довжини, обов'язковість і перевірки.
 /// </summary>
 public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
 {
@@ -47,12 +47,6 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
 
         builder.Property(doctor => doctor.ExperienceYears)
             .IsRequired();
-
-        builder.HasIndex(doctor => doctor.Email)
-            .IsUnique();
-
-        builder.HasIndex(doctor => doctor.LicenseNumber)
-            .IsUnique();
 
         builder.ToTable(table =>
         {

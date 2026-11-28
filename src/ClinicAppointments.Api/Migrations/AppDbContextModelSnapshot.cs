@@ -59,12 +59,6 @@ namespace ClinicAppointments.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("LicenseNumber")
-                        .IsUnique();
-
                     b.ToTable("Doctors", t =>
                         {
                             t.HasCheckConstraint("CK_Doctors_ExperienceYears", "\"ExperienceYears\" >= 0 AND \"ExperienceYears\" <= 60");

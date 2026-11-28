@@ -30,18 +30,6 @@ namespace ClinicAppointments.Api.Migrations
                     table.CheckConstraint("CK_Doctors_ExperienceYears", "\"ExperienceYears\" >= 0 AND \"ExperienceYears\" <= 60");
                     table.CheckConstraint("CK_Doctors_Phone_E164", "\"Phone\" ~ '^\\+[1-9][0-9]{1,14}$'");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Doctors_Email",
-                table: "Doctors",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Doctors_LicenseNumber",
-                table: "Doctors",
-                column: "LicenseNumber",
-                unique: true);
         }
 
         /// <inheritdoc />
