@@ -4,7 +4,7 @@
 
 Діаграма охоплює сутності, які прямо названі в задачі (Specialization, Doctor, Patient, MedicalService, Cabinet), і сутності, без яких ці зв'язки не зберігаються в реляційній базі: таблицю M:N, графік, прийом і запис медичної картки.
 
-Міграція `AddCabinet` створює таблицю `Cabinets` (`Id`, `Number`, `Floor`, `Description`).
+Міграція `AddCabinet` створює таблицю `Cabinets` (`Id`, `Number`, `Floor`, `Description`). Унікального індексу номера в ній немає: його додасть #29 разом із відповіддю 409.
 
 ## Діаграма
 
@@ -42,7 +42,7 @@ erDiagram
 
     Cabinet {
         int Id PK
-        string Number UK "varchar(10) NOT NULL"
+        string Number "varchar(10) NOT NULL, унікальний індекс у #29"
         int Floor "integer NOT NULL"
         string Description "varchar(500) NULL"
     }
@@ -116,7 +116,7 @@ erDiagram
 | Doctor | ExperienceYears | `integer` | NOT NULL, CHECK 0..60 |
 | Doctor | DeletedAt | `timestamptz` | NULL; значення означає звільнення, рядок не видаляється |
 | Cabinet | Id | `integer` | PK |
-| Cabinet | Number | `varchar(10)` | NOT NULL, UNIQUE |
+| Cabinet | Number | `varchar(10)` | NOT NULL; унікальний індекс додасть #29 |
 | Cabinet | Floor | `integer` | NOT NULL |
 | Cabinet | Description | `varchar(500)` | NULL |
 | Patient | Id | `integer` | PK |

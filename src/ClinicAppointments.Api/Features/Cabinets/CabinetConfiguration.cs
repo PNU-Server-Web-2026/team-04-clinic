@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace ClinicAppointments.Api.Features.Cabinets;
 
 /// <summary>
-/// Обмеження кабінету в PostgreSQL: довжини, обов'язковість і унікальність номера.
+/// Обмеження кабінету в PostgreSQL: довжини й обов'язковість.
 /// </summary>
 public class CabinetConfiguration : IEntityTypeConfiguration<Cabinet>
 {
@@ -25,8 +25,5 @@ public class CabinetConfiguration : IEntityTypeConfiguration<Cabinet>
 
         builder.Property(cabinet => cabinet.Description)
             .HasMaxLength(DescriptionMaxLength);
-
-        builder.HasIndex(cabinet => cabinet.Number)
-            .IsUnique();
     }
 }

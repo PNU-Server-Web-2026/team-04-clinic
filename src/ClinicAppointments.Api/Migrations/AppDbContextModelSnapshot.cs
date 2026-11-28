@@ -43,9 +43,6 @@ namespace ClinicAppointments.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Number")
-                        .IsUnique();
-
                     b.ToTable("Cabinets");
                 });
 #pragma warning restore 612, 618
